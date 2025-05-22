@@ -5,6 +5,7 @@ import { Subscription } from "rxjs";
 import RowData from "./RowData";
 import RenderPageNumbers from "./RenderPageNumbers";
 import EditDataForm from "./EditDataForm";
+import SearchContainer from "./SearchContainer";
 
 
 const PAGE_SIZE = 10;
@@ -110,13 +111,7 @@ export const  UserTable = ()=>{
 
     return(
         <div className="py-6 px-[6rem]">
-            <input
-                type="text"
-                placeholder="Search by name, email or role"
-                className="p-2 border-2 w-full mb-4"
-                value={search}
-                onChange={handleSearchChange}
-            />
+            <SearchContainer search={search} handleSearchChange={handleSearchChange}/>
             {showEdit && editData  && (
                 <EditDataForm handleUpdateRow={handleUpdateRow} editData={editData} handleCancle={handleCancle} handleEditSingleCell={handleEditSingleCell}/>
             )}
