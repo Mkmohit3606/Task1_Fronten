@@ -2,9 +2,10 @@ import React,{useState, useEffect} from "react";
 import { Users$ } from "../services/api";
 import { User } from "../types/TableTypes";
 import { Subscription } from "rxjs";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faPenSquare } from "@fortawesome/free-solid-svg-icons";
+import RowData from "./RowData";
+import RenderPageNumbers from "./RenderPageNumbers";
+import EditDataForm from "./EditDataForm";
+
 
 const PAGE_SIZE = 10;
 
@@ -13,12 +14,14 @@ export const  UserTable = ()=>{
     const[data, setData]= useState<User[]>([]);
     const[search,setSearch]= useState("");
     const[selectedId, setSelectedId]=useState<string[]>([]);
+    const[showEdit,setShowEdit]= useState(false);
+    const [editData, setEditData] = useState<User | null>(null);
     const[page,setPage]= useState(1);
     const goToFirstPage = () => setPage(1);
     const goToLastPage = () => setPage(pageCount);
     const goToPrevPage = () => setPage(prev => Math.max(prev - 1, 1));
     const goToNextPage = () => setPage(prev => Math.min(prev + 1, pageCount));
-
+    const handlePage = (i:number)=>setPage(i);
 
     //Load the api
     useEffect(()=>{
@@ -26,13 +29,34 @@ export const  UserTable = ()=>{
         return ()=>sub.unsubscribe();
     },[]);
 
-    const filtered = data.filter(u=>
-        Object.values(u).some(v=>String(v).toLowerCase().includes(search.toLowerCase()) )
+    /**
+     * how filter work here
+     * when we type anything in search bar the it call the function handleSearchChange
+     * then the function will update state of search and page and based on update state the component will be re-render
+     * it will change the data for filtered, paginated and pageCount
+     */
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1); // Optional: Reset pagination to first page
+    };
+
+
+    const filterUsers = (users: User[], query: string): User[] => {
+    const lowerQuery = query.toLowerCase();
+    return users.filter(user =>
+        Object.values(user).some(val =>
+        String(val).toLowerCase().includes(lowerQuery)
+        )
     );
+    };
+
+
+    const filtered = filterUsers(data, search);
 
     const paginated = filtered.slice((page -1)*PAGE_SIZE, page*PAGE_SIZE);
     const pageCount = Math.ceil(filtered.length/PAGE_SIZE);
 
+    // Start of Toggle and Delete Data
     const toggleSelect = (id:string)=>{
         setSelectedId(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
     };
@@ -52,40 +76,53 @@ export const  UserTable = ()=>{
         Users$.next(data.filter(u =>!selectedId.includes(u.id)));
         setSelectedId([]);
     }
+    // End of Delete Data
 
-    const renderPageNumbers = () => {
-        const pages = [];
-        for (let i = 1; i <= pageCount; i++) {
-            pages.push(
-                <span
-                    key={i}
-                    onClick={() => setPage(i)}
-                    className={`w-[30px] h-[30px] rounded-full mx-1 inline-flex items-center justify-center cursor-pointer ${
-                        page === i ? 'bg-red-700 text-white' : 'bg-gray-200 text-black'
-                    }`}
-                >
-                    {i}
-                </span>
-            );
-        }
-        return pages;
+    // For Start Edit Data
+    const handleUpdateRow =(event:React.FormEvent)=>{
+        event.preventDefault();
+        if (!editData) return;
+    const updated = data.map(user =>
+      user.id === editData.id ? editData : user
+    );
+    Users$.next(updated);
+    setShowEdit(false);
+        setShowEdit(false);
+    }
+
+    const handleEdit = (id:string)=>{
+        setShowEdit(true);
+        const editDataGet = paginated.find(u => u.id === id) || null;
+        setEditData(editDataGet);
+    }
+    const handleEditSingleCell = (valueName: string, value: string) => {
+        setEditData(prev => {
+            if (!prev) return prev; // safety check
+            return { ...prev, [valueName]: value };
+        });
     };
 
+    const handleCancle =()=>{
+        setEditData(null);
+        setShowEdit(false);
+    }
+    // End of Edit Data
 
     return(
         <div className="py-6 px-[6rem]">
             <input
                 type="text"
                 placeholder="Search by name, email or role"
-                className="p-2 border w-full mb-4"
+                className="p-2 border-2 w-full mb-4"
                 value={search}
-                onChange={e=>{
-                    setSearch(e.target.value);
-                    setPage(1);
-                }}
+                onChange={handleSearchChange}
             />
-            <table className="w-full border">
-                <thead className="border py-2 border-b-2">
+            {showEdit && editData  && (
+                <EditDataForm handleUpdateRow={handleUpdateRow} editData={editData} handleCancle={handleCancle} handleEditSingleCell={handleEditSingleCell}/>
+            )}
+            <table className="w-[80%] border table table-striped overflow-hidden">
+                <thead className="border">
+                    <tr>
                     <th className="text-start">
                         <input
                             className="ml-3"
@@ -100,34 +137,14 @@ export const  UserTable = ()=>{
                     <th>Email</th>
                     <th>Role</th>
                     <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
-                            {
-                                paginated.map((user)=>(
-                                    <tr key={user.id} className="border my-2">
-                                        <td className="text-start">
-                                            <input 
-                                                className="ml-3"
-                                                type="checkbox"
-                                                checked={selectedId.includes(user.id)}
-                                                onChange={()=>toggleSelect(user.id)}
-                                            />
-                                        </td>
-                                        <td className="text-center">{user.name}</td>
-                                        <td className="text-center">{user.email}</td>
-                                        <td className="text-center">{user.role}</td>
-                                        { <td className="flex row justify-center">
-                                            <FontAwesomeIcon icon={faPenSquare} className=" inline cursor-pointer text-[25px] mr-3"/>
-                                            <FontAwesomeIcon icon={faTrash} className="inline text-[25px] cursor-pointer text-red-500"
-                                            onClick={() => deleteUser(user.id)}/>
-                                        </td>}
-                                    </tr>
-                                ))
-                            }
+                  <RowData paginated={paginated} deleteUser={deleteUser} toggleSelect={toggleSelect} selectedId={selectedId} handleEdit={handleEdit}/>  
                 </tbody>
                 <tfoot className="h-[40px]">
                     <tr>
-                        <td><span className="ml-3 border border-red-500 bg-red-500 rounded-[7px] p-[7px] w-fit">Delete Selected</span></td>
+                        <td><span className="ml-3 border border-red-500 bg-red-500 rounded-[7px] p-[7px] w-fit cursor-pointer" onClick={deleteSelected}>Delete Selected</span></td>
                         <td colSpan={4} className="p-2 text-center">
                             <span onClick={goToFirstPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page > 1 ?"bg-red-500":"bg-gray-500"
@@ -135,7 +152,7 @@ export const  UserTable = ()=>{
                             <span onClick={goToPrevPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page > 1 ?"bg-red-500":"bg-gray-500"
                             } text-white p-[5px] mx-2`}>&nbsp;&lt;&nbsp;</span>
-                            {renderPageNumbers()}
+                            <RenderPageNumbers pageCount={pageCount} page={page} handlePage={handlePage}/>
                             <span onClick={goToNextPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page < pageCount ?"bg-red-500":"bg-gray-500"
                             } text-white p-[5px] mx-2`}>&nbsp;&gt;&nbsp;</span>
