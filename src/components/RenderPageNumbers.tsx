@@ -11,7 +11,7 @@ const RenderPageNumbers = ({pageCount,page,handlePage}:RenderPageNumbersProp) =>
                 <span
                     key={i}
                     onClick={() => handlePage(i)}
-                    className={`w-[30px] h-[30px] rounded-full mx-1 inline-flex items-center justify-center cursor-pointer ${
+                    className={`w-[40px] h-[40px] rounded-full mx-1 text-[20px] inline-flex items-center justify-center cursor-pointer ${
                         page === i ? 'bg-red-700 text-white' : 'bg-gray-200 text-black'
                     }`}
                 >

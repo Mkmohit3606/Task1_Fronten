@@ -120,7 +120,7 @@ export const  UserTable = ()=>{
                     <tr>
                     <th className="text-start">
                         <input
-                            className="ml-3"
+                            className="ml-3 w-[18px] h-[18px]"
                             type="checkbox"
                             checked={
                                 paginated.length>0 && paginated.every(u=>selectedId.includes(u.id))
@@ -128,10 +128,10 @@ export const  UserTable = ()=>{
                             onChange={toggleSelectAll}
                         />
                     </th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
+                    <th className="text-[20px]">Name</th>
+                    <th className="text-[20px]">Email</th>
+                    <th className="text-[20px]">Role</th>
+                    <th className="text-[20px]">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,21 +139,21 @@ export const  UserTable = ()=>{
                 </tbody>
                 <tfoot className="h-[40px]">
                     <tr>
-                        <td><span className="ml-3 border border-red-500 bg-red-500 rounded-[7px] p-[7px] w-fit cursor-pointer" onClick={deleteSelected}>Delete Selected</span></td>
+                        <td><span className="ml-3 border border-red-500 bg-red-500 text-white rounded-[12px] p-[7px] w-fit cursor-pointer" onClick={deleteSelected}>Delete Selected</span></td>
                         <td colSpan={4} className="p-2 text-center">
                             <span onClick={goToFirstPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page > 1 ?"bg-red-500":"bg-gray-500"
-                            } text-white p-[5px] mx-2`}>&lt;&lt;</span>
+                            } text-white p-[10px] mx-2`}>&lt;&lt;</span>
                             <span onClick={goToPrevPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page > 1 ?"bg-red-500":"bg-gray-500"
-                            } text-white p-[5px] mx-2`}>&nbsp;&lt;&nbsp;</span>
+                            } text-white p-[8px] mx-2`}>&nbsp;&lt;&nbsp;</span>
                             <RenderPageNumbers pageCount={pageCount} page={page} handlePage={handlePage}/>
                             <span onClick={goToNextPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page < pageCount ?"bg-red-500":"bg-gray-500"
-                            } text-white p-[5px] mx-2`}>&nbsp;&gt;&nbsp;</span>
+                            } text-white p-[8px] mx-2`}>&nbsp;&gt;&nbsp;</span>
                             <span onClick={goToLastPage} className={`w-[30px] h-[30px] cursor-pointer rounded-full ${
                                 page < pageCount ?"bg-red-500":"bg-gray-500"
-                            } text-white p-[5px] mx-2`}>&gt;&gt;</span>
+                            } text-white p-[10px] mx-2`}>&gt;&gt;</span>
                         </td>
                     </tr>
                 </tfoot>

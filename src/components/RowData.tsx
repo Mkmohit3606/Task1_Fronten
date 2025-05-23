@@ -20,20 +20,20 @@ const rowData = ({ paginated, deleteUser, toggleSelect, selectedId, handleEdit }
                     <tr key={user.id} className="border">
                         <td className="text-start">
                             <input
-                                className="ml-3"
+                                className="ml-3 text-[23px] w-[18px] h-[18px]"
                                 type="checkbox"
                                 checked={selectedId.includes(user.id)}
                                 onChange={() => toggleSelect(user.id)}
                             />
                         </td>
-                        <td className="text-start">{user.name}</td>
-                        <td className="text-start">{user.email}</td>
-                        <td className="text-start">{user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()}</td>
+                        <td className="text-start text-[23px]">{user.name}</td>
+                        <td className="text-start text-[23px]">{user.email}</td>
+                        <td className="text-start text-[23px]">{user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()}</td>
                         {<td className="flex justify-start">
-                            <FontAwesomeIcon icon={faPenSquare} className=" inline cursor-pointer text-[25px] mr-3 w-fit" 
+                            <FontAwesomeIcon icon={faPenSquare} className=" inline cursor-pointer text-[34px] mr-3 w-fit" 
                             onClick={()=>handleEdit(user.id)}
                             />
-                            <FontAwesomeIcon icon={faTrash} className="inline text-[25px] cursor-pointer text-red-500 w-fit"
+                            <FontAwesomeIcon icon={faTrash} className="inline text-[34px] cursor-pointer text-red-500 w-fit"
                                 onClick={() => deleteUser(user.id)} />
                         </td>}
                     </tr>
